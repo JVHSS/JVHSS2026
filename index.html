@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exhibition Feedback</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6fb;
+}
+
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #2563eb;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-top: 15px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1e4fd6;
+}
+
+.success {
+  text-align: center;
+  color: green;
+  margin-top: 15px;
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Exhibition Feedback Form</h2>
+
+<form id="feedbackForm"
+action="https://script.google.com/macros/s/AKfycby2XxpENbNf5FoyrOMGIq7kIhjLwzggL-cl7l-PskQELBPZOFpWHRszxbj4mWAEx-4D/exec"
+method="POST"
+onsubmit="showSuccess()">
+
+<label>Name</label>
+<input type="text" name="name" required>
+
+<label>Rating</label>
+<select name="rating" required>
+  <option value="">Select Rating</option>
+  <option>⭐ Excellent</option>
+  <option>😊 Good</option>
+  <option>🙂 Average</option>
+  <option>😐 Poor</option>
+</select>
+
+<label>What did you like?</label>
+<textarea name="like"></textarea>
+
+<label>Suggestions for improvement</label>
+<textarea name="suggestion"></textarea>
+
+<label>Overall Experience</label>
+<textarea name="experience"></textarea>
+
+<button type="submit">Submit Feedback</button>
+</form>
+
+<div class="success" id="successMsg">
+✅ Thank you for your valuable feedback!
+</div>
+
+</div>
+
+<script>
+function showSuccess() {
+  document.getElementById("successMsg").style.display = "block";
+}
+</script>
+
+</body>
+</html>
