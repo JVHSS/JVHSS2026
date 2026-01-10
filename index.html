@@ -2,110 +2,119 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exhibition Feedback</title>
+<title>Exhibition Feedback Form</title>
 
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: #f4f6fb;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
 }
 
 .container {
-  max-width: 600px;
-  margin: 40px auto;
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 400px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
 }
 
 h2 {
-  text-align: center;
-  color: #2563eb;
+    text-align: center;
 }
 
 label {
-  font-weight: bold;
-  display: block;
-  margin-top: 15px;
+    font-weight: bold;
 }
 
-input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 15px 0;
 }
 
 button {
-  width: 100%;
-  margin-top: 20px;
-  padding: 12px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 button:hover {
-  background: #1e4fd6;
+    background-color: #45a049;
 }
 
-.success {
-  text-align: center;
-  color: green;
-  margin-top: 15px;
-  display: none;
+#thankYouBox {
+    display: none;
+    text-align: center;
+    padding: 30px;
+}
+
+#thankYouBox h2 {
+    color: #16a34a;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-<h2>Exhibition Feedback Form</h2>
+<div class="container" id="formBox">
+    <h2>Exhibition Feedback Form</h2>
 
-<form id="feedbackForm"
-action="https://script.google.com/macros/s/AKfycby2XxpENbNf5FoyrOMGIq7kIhjLwzggL-cl7l-PskQELBPZOFpWHRszxbj4mWAEx-4D/exec"
-method="POST"
-onsubmit="showSuccess()">
+    <!-- hidden iframe to stop page reload -->
+    <iframe name="hiddenFrame" style="display:none;"></iframe>
 
-<label>Name</label>
-<input type="text" name="name" required>
+    <form 
+      action="https://script.google.com/macros/s/AKfycbyHrzS8bCTA9mLM48BWcZPed5PejzcOYpW0UfzmAYC-d1a8z94-9v6eI9qinch0mG1UBA/exec"
+      method="POST"
+      target="hiddenFrame"
+      onsubmit="showThankYou()">
 
-<label>Rating</label>
-<select name="rating" required>
-  <option value="">Select Rating</option>
-  <option>⭐ Excellent</option>
-  <option>😊 Good</option>
-  <option>🙂 Average</option>
-  <option>😐 Poor</option>
-</select>
+        <label>Name:</label>
+        <input type="text" name="name" required>
 
-<label>What did you like?</label>
-<textarea name="like"></textarea>
+        <label>Class:</label>
+        <input type="text" name="studentClass" required>
 
-<label>Suggestions for improvement</label>
-<textarea name="suggestion"></textarea>
+        <label>Section:</label>
+        <input type="text" name="section" required>
 
-<label>Overall Experience</label>
-<textarea name="experience"></textarea>
+        <label>Rating:</label>
+        <select name="rating" required>
+            <option value="">Select Rating</option>
+            <option>⭐ Excellent</option>
+            <option>😊 Good</option>
+            <option>🙂 Average</option>
+            <option>😐 Poor</option>
+        </select>
 
-<button type="submit">Submit Feedback</button>
-</form>
+        <label>What did you like?</label>
+        <textarea name="like" rows="3"></textarea>
 
-<div class="success" id="successMsg">
-✅ Thank you for your valuable feedback!
+        <label>Suggestions for Improvement:</label>
+        <textarea name="improvement" rows="3"></textarea>
+
+        <label>Overall Experience:</label>
+        <textarea name="experience" rows="3"></textarea>
+
+        <button type="submit">Submit Feedback</button>
+    </form>
 </div>
 
+<!-- THANK YOU MESSAGE -->
+<div class="container" id="thankYouBox">
+    <h2>✅ Thanks for your feedback!</h2>
+    <p>Your response has been recorded successfully.</p>
 </div>
 
 <script>
-function showSuccess() {
-  document.getElementById("successMsg").style.display = "block";
+function showThankYou() {
+    setTimeout(() => {
+        document.getElementById("formBox").style.display = "none";
+        document.getElementById("thankYouBox").style.display = "block";
+    }, 500);
 }
 </script>
 
