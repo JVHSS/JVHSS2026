@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rock Paper Scissors - Animation & Score</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: #eef2ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+.game {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  width: 350px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.hands {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  font-size: 80px;
+  perspective: 800px;
+}
+
+.hand {
+  display: inline-block;
+  transform-origin: bottom center;
+  transition: transform 0.3s ease;
+}
+
+.playing .hand.user {
+  animation: moveForward 1.2s forwards;
+}
+
+.playing .hand.computer {
+  animation: moveForward 1.2s forwards;
+}
+
+@keyframes moveForward {
+  0% { transform: translateZ(0) rotate(0deg); }
+  25% { transform: translateZ(30px) rotate(15deg); }
+  50% { transform: translateZ(60px) rotate(-15deg); }
+  75% { transform: translateZ(30px) rotate(10deg); }
+  100% { transform: translateZ(0) rotate(0deg); }
+}
+
+.buttons button {
+  padding: 10px 14px;
+  margin: 5px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.buttons button:hover {
+  background: #1e40af;
+}
+
+#restartBtn {
+  background: #10b981; /* green */
+}
+
+#restartBtn:hover {
+  background: #047857;
+}
+
+.result {
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.scoreboard {
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-around;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game" id="game">
+  <h2>Rock Paper Scissors</h2>
+
+  <div class="hands">
+    <div class="hand user" id="userHand">✊</div>
+    <div class="hand computer" id="computerHand">✊</div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="play('rock')">✊ Rock</button>
+    <button onclick="play('paper')">✋ Paper</button>
+    <button onclick="play('scissors')">✌ Scissors</button>
+    <button id="restartBtn" onclick="restartGame()" style="display:none;">🔄 Restart</button>
+  </div>
+
+  <div class="result" id="result">Choose your move</div>
+
+  <div class="scoreboard">
+    <div>User: <span id="userScore">0</span></div>
+    <div>AI: <span id="aiScore">0</span></div>
+  </div>
+</div>
+
+<script>
+const userHand = document.getElementById("userHand");
+const computerHand = document.getElementById("computerHand");
+const result = document.getElementById("result");
+const game = document.getElementById("game");
+const userScoreEl = document.getElementById("userScore");
+const aiScoreEl = document.getElementById("aiScore");
+const restartBtn = document.getElementById("restartBtn");
+
+let userScore = 0;
+let aiScore = 0;
+
+const hands = {
+  rock: "✊",
+  paper: "✋",
+  scissors: "✌"
+};
+
+function play(userChoice) {
+  if (userScore === 3 || aiScore === 3) return; // Best of 5
+
+  const choices = ["rock", "paper", "scissors"];
+  const computerChoice = choices[Math.floor(Math.random() * 3)];
+
+  // Reset hands to rock for animation
+  userHand.textContent = "✊";
+  computerHand.textContent = "✊";
+
+  game.classList.add("playing");
+  result.innerText = "Rock... Paper... Scissors...";
+
+  setTimeout(() => {
+    userHand.textContent = hands[userChoice];
+    computerHand.textContent = hands[computerChoice];
+    game.classList.remove("playing");
+
+    // Determine winner
+    if (userChoice === computerChoice) {
+      result.innerText = "It's a Draw 🤝";
+    } else if (
+      (userChoice === "rock" && computerChoice === "scissors") ||
+      (userChoice === "paper" && computerChoice === "rock") ||
+      (userChoice === "scissors" && computerChoice === "paper")
+    ) {
+      userScore++;
+      result.innerText = "You Win 🎉";
+    } else {
+      aiScore++;
+      result.innerText = "You Lose 😢";
+    }
+
+    userScoreEl.textContent = userScore;
+    aiScoreEl.textContent = aiScore;
+
+    // Check for Best-of-5 winner
+    if (userScore === 3) {
+      result.innerText = "🏆 You won the best of 5!";
+      restartBtn.style.display = "inline-block"; // Show restart
+    }
+    if (aiScore === 3) {
+      result.innerText = "🤖 AI won the best of 5!";
+      restartBtn.style.display = "inline-block"; // Show restart
+    }
+  }, 1200);
+}
+
+function restartGame() {
+  userScore = 0;
+  aiScore = 0;
+  userScoreEl.textContent = userScore;
+  aiScoreEl.textContent = aiScore;
+  result.innerText = "Choose your move";
+  userHand.textContent = "✊";
+  computerHand.textContent = "✊";
+  restartBtn.style.display = "none"; // Hide restart
+}
+</script>
+
+</body>
+</html>

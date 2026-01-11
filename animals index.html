@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Memory Match – Timer Challenge</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #1a1a2e;
+  color: white;
+  text-align: center;
+}
+
+h1 { color: #00ffd5; }
+
+#timer {
+  font-size: 18px;
+  margin: 10px;
+  color: yellow;
+}
+
+#game {
+  display: grid;
+  grid-template-columns: repeat(4, 90px);
+  gap: 12px;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.card {
+  width: 90px;
+  height: 90px;
+  background: #222;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.card.flipped {
+  background: #00ffd5;
+}
+
+button {
+  padding: 10px 20px;
+  background: #00ffd5;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.hidden { display: none; }
+</style>
+</head>
+
+<body>
+
+<h1>🧠 Memory Match</h1>
+<div id="timer">⏱ Time Left: <span id="time">60</span>s</div>
+
+<div id="game"></div>
+
+<div id="result"></div>
+
+<button onclick="startGame()">🔄 Restart</button>
+
+<script>
+const animals = ["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼"];
+
+let cards = [];
+let firstCard = null;
+let secondCard = null;
+let lock = false;
+let matched = 0;
+let timeLeft = 60;
+let timer;
+
+function startGame() {
+  clearInterval(timer);
+  const game = document.getElementById("game");
+  document.getElementById("result").textContent = "";
+  game.innerHTML = "";
+  matched = 0;
+  firstCard = null;
+  secondCard = null;
+  lock = false;
+  timeLeft = 60;
+  document.getElementById("time").textContent = timeLeft;
+
+  cards = [...animals, ...animals].sort(() => Math.random() - 0.5);
+
+  cards.forEach(symbol => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.symbol = symbol;
+    card.textContent = "❓";
+    card.onclick = () => flipCard(card);
+    game.appendChild(card);
+  });
+
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("time").textContent = timeLeft;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      endGame(false);
+    }
+  }, 1000);
+}
+
+function flipCard(card) {
+  if (lock || card === firstCard || card.classList.contains("flipped") || timeLeft <= 0) return;
+
+  card.classList.add("flipped");
+  card.textContent = card.dataset.symbol;
+
+  if (!firstCard) {
+    firstCard = card;
+    return;
+  }
+
+  secondCard = card;
+  lock = true;
+
+  if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+    matched++;
+    resetTurn();
+    if (matched === animals.length) {
+      clearInterval(timer);
+      endGame(true);
+    }
+  } else {
+    setTimeout(() => {
+      firstCard.classList.remove("flipped");
+      secondCard.classList.remove("flipped");
+      firstCard.textContent = "❓";
+      secondCard.textContent = "❓";
+      resetTurn();
+    }, 700);
+  }
+}
+
+function resetTurn() {
+  firstCard = null;
+  secondCard = null;
+  lock = false;
+}
+
+function endGame(win) {
+  const result = document.getElementById("result");
+  if (win) {
+    result.textContent = "🎉 YOU WIN! Escaped in time!";
+    result.style.color = "lightgreen";
+  } else {
+    result.textContent = "⛔ TIME OVER! You are trapped!";
+    result.style.color = "red";
+  }
+}
+startGame();
+</script>
+
+</body>
+</html>

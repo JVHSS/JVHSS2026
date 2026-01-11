@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Race Game with Leaderboard</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #1a1a2e;
+  color: white;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  min-height: 100vh;
+}
+
+.container {
+  background: #2e2e50;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 0 25px #00ffd5;
+  margin-bottom: 20px;
+}
+
+h1 { color: #00ffd5; }
+
+.timer {
+  color: #ffea00;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.word-display {
+  font-size: 22px;
+  margin: 20px 0;
+}
+
+input {
+  padding: 10px;
+  width: 70%;
+  border-radius: 6px;
+  border: none;
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  margin-top: 12px;
+  background: #00ffd5;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover { background: #00c9aa; }
+
+.hidden { display: none; }
+.success { color: lightgreen; font-size: 22px; }
+.fail { color: red; font-size: 22px; }
+
+.leaderboard {
+  background: #1f1f40;
+  padding: 15px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.leaderboard h2 {
+  color: #ffea00;
+  margin-top: 0;
+}
+
+.leaderboard ol { padding-left: 20px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>⌨️ Typing Race</h1>
+  <div class="timer">⏱ Time Left: <span id="time">60</span>s</div>
+  <div id="scoreDisplay">Score: <span id="score">0</span></div>
+
+  <div id="game">
+    <div class="word-display" id="wordDisplay"></div>
+    <input type="text" id="wordInput" placeholder="Type the word here">
+    <br>
+    <button onclick="checkWord()">Submit</button>
+  </div>
+
+  <div id="win" class="hidden success">
+    🎉 Time's Up! Your Score: <span id="finalScore">0</span> 🎉
+    <br><button onclick="nextPlayer()">Next Player ▶</button>
+  </div>
+</div>
+
+<div class="leaderboard">
+  <h2>🏆 Leaderboard</h2>
+  <ol id="leaderboardList"></ol>
+</div>
+
+<script>
+// 30 WORDS
+const words = [
+  "apple","banana","orange","grape","watermelon","kiwi","mango","peach","cherry","lemon",
+  "strawberry","blueberry","pineapple","papaya","avocado","coconut","pear","plum","apricot",
+  "fig","melon","raspberry","lime","pomegranate","guava","nectarine","passionfruit","blackberry","cantaloupe","tangerine"
+];
+
+let timeLeft = 60;
+let timer;
+let score = 0;
+let currentWord = "";
+let leaderboard = [];
+
+// LOAD LEADERBOARD FROM localStorage
+function loadLeaderboard(){
+  const saved = localStorage.getItem("typingLeaderboard");
+  if(saved){
+    leaderboard = JSON.parse(saved);
+    updateLeaderboardDisplay();
+  }
+}
+
+// PICK RANDOM WORD
+function pickWord(){
+  const index = Math.floor(Math.random() * words.length);
+  currentWord = words[index];
+  document.getElementById("wordDisplay").textContent = currentWord;
+  document.getElementById("wordInput").value = '';
+  document.getElementById("wordInput").focus();
+}
+
+// CHECK WORD
+function checkWord(){
+  const userInput = document.getElementById("wordInput").value.trim().toLowerCase();
+  if(userInput === currentWord){
+    score++;
+    document.getElementById("score").textContent = score;
+    pickWord();
+  } else {
+    pickWord(); // wrong word does not end game, just next word
+  }
+}
+
+// TIMER
+function startTimer(){
+  clearInterval(timer);
+  timeLeft = 60;
+  score = 0;
+  document.getElementById("score").textContent = score;
+  document.getElementById("time").textContent = timeLeft;
+  document.getElementById("game").classList.remove("hidden");
+  document.getElementById("win").classList.add("hidden");
+  pickWord();
+
+  timer = setInterval(()=>{
+    timeLeft--;
+    document.getElementById("time").textContent = timeLeft;
+    if(timeLeft <= 0){
+      endGame();
+    }
+  },1000);
+}
+
+// END GAME
+function endGame(){
+  clearInterval(timer);
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("finalScore").textContent = score;
+  document.getElementById("win").classList.remove("hidden");
+
+  // Add score to leaderboard
+  leaderboard.push(score);
+  leaderboard.sort((a,b)=>b-a); // descending
+  localStorage.setItem("typingLeaderboard", JSON.stringify(leaderboard));
+  updateLeaderboardDisplay();
+}
+
+// UPDATE LEADERBOARD DISPLAY
+function updateLeaderboardDisplay(){
+  const lb = document.getElementById("leaderboardList");
+  lb.innerHTML = '';
+  leaderboard.slice(0,10).forEach((s,i)=>{ // show top 10
+    const li = document.createElement("li");
+    li.textContent = s;
+    lb.appendChild(li);
+  });
+}
+
+// NEXT PLAYER
+function nextPlayer(){
+  startTimer();
+}
+
+// INITIALIZE GAME
+loadLeaderboard();
+startTimer();
+
+</script>
+</body>
+</html>

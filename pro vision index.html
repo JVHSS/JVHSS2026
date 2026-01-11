@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Focus Vision Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#000;
+  color:white;
+  text-align:center;
+}
+
+h1{
+  color:#00ffcc;
+  letter-spacing:2px;
+}
+
+.panel{
+  max-width:520px;
+  margin:auto;
+  padding:15px;
+}
+
+input{
+  padding:10px;
+  width:70%;
+  border-radius:6px;
+  border:none;
+  text-align:center;
+}
+
+button{
+  padding:10px 20px;
+  margin:10px;
+  border:none;
+  border-radius:6px;
+  font-size:16px;
+  background:#00ffcc;
+  cursor:pointer;
+}
+
+button:hover{background:#00ccaa;}
+
+#arena{
+  position:relative;
+  width:320px;
+  height:320px;
+  margin:20px auto;
+  border:2px solid #00ffcc;
+  overflow:hidden;
+}
+
+.target{
+  position:absolute;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+}
+
+.correct{
+  background:lime;
+  color:black;
+  box-shadow:0 0 15px lime;
+}
+
+.fake{
+  background:red;
+  color:white;
+}
+
+.timer{
+  font-size:22px;
+  color:yellow;
+}
+
+.score{
+  font-size:20px;
+}
+
+.result{
+  font-size:26px;
+  margin-top:15px;
+}
+
+.leaderboard{
+  max-width:400px;
+  margin:20px auto;
+  background:#111;
+  padding:15px;
+  border-radius:10px;
+  text-align:left;
+}
+
+.leaderboard h2{
+  color:gold;
+  text-align:center;
+}
+
+.hidden{display:none;}
+</style>
+</head>
+
+<body>
+
+<h1>👀 FOCUS VISION TEST</h1>
+
+<div class="panel">
+  <input id="playerName" placeholder="Enter Player Name">
+  <div class="timer">⏱ Time: <span id="time">30</span>s</div>
+  <div class="score">Score: <span id="score">0</span></div>
+  <button onclick="startGame()">START TEST</button>
+</div>
+
+<div id="arena"></div>
+
+<div class="result" id="result"></div>
+<button class="hidden" id="restartBtn" onclick="restart()">NEXT PLAYER</button>
+
+<div class="leaderboard">
+  <h2>🏆 LEADERBOARD</h2>
+  <ol id="board"></ol>
+</div>
+
+<script>
+/* ---------- AUDIO ---------- */
+const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+
+function play(freq,dur,type="sine"){
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.type=type;
+  o.frequency.value=freq;
+  o.connect(g);
+  g.connect(audioCtx.destination);
+  g.gain.value=0.15;
+  o.start();
+  o.stop(audioCtx.currentTime+dur);
+}
+
+function successBeep(){ play(800,0.15,"triangle"); }
+
+function sirenAlarm(){
+  let f=400;
+  const id=setInterval(()=>{
+    play(f,0.1,"sawtooth");
+    f = f===400 ? 650 : 400;
+  },150);
+  setTimeout(()=>clearInterval(id),1200);
+}
+
+/* ---------- GAME VARIABLES ---------- */
+const arena=document.getElementById("arena");
+let time=30, timer, score=0, active=false, speed=1200;
+let leaderboard=[];
+
+/* ---------- LOAD LEADERBOARD ---------- */
+function loadBoard(){
+  const data=localStorage.getItem("focusBoard");
+  if(data){
+    leaderboard=JSON.parse(data);
+    updateBoard();
+  }
+}
+
+/* ---------- UPDATE LEADERBOARD ---------- */
+function updateBoard(){
+  const board=document.getElementById("board");
+  board.innerHTML="";
+  leaderboard.slice(0,5).forEach(p=>{
+    const li=document.createElement("li");
+    li.textContent = `${p.name} – ${p.score}`;
+    board.appendChild(li);
+  });
+}
+
+/* ---------- START GAME ---------- */
+function startGame(){
+  audioCtx.resume();
+  const name=document.getElementById("playerName").value.trim();
+  if(!name){alert("Enter player name");return;}
+
+  arena.innerHTML="";
+  score=0;
+  time=30;
+  speed=1200;
+  active=true;
+
+  document.getElementById("score").textContent=score;
+  document.getElementById("time").textContent=time;
+  document.getElementById("result").textContent="";
+  document.getElementById("restartBtn").classList.add("hidden");
+
+  spawnTargets();
+
+  timer=setInterval(()=>{
+    time--;
+    document.getElementById("time").textContent=time;
+    if(time<=0){
+      endGame("⏳ TIME UP!");
+    }
+  },1000);
+}
+
+/* ---------- SPAWN TARGETS ---------- */
+function spawnTargets(){
+  if(!active) return;
+
+  arena.innerHTML="";
+
+  const correct=document.createElement("div");
+  correct.className="target correct";
+  correct.textContent="★";
+  randomPos(correct);
+  correct.onclick=()=>{
+    successBeep();
+    score++;
+    speed=Math.max(350,speed-80);
+    document.getElementById("score").textContent=score;
+    spawnTargets();
+  };
+  arena.appendChild(correct);
+
+  const symbols=["✖","●","▲"];
+  for(let i=0;i<3;i++){
+    const fake=document.createElement("div");
+    fake.className="target fake";
+    fake.textContent=symbols[i];
+    randomPos(fake);
+    fake.onclick=()=>{
+      wrongClick();
+    };
+    arena.appendChild(fake);
+  }
+
+  setTimeout(spawnTargets,speed);
+}
+
+/* ---------- RANDOM POSITION ---------- */
+function randomPos(el){
+  el.style.left=Math.random()*280+"px";
+  el.style.top=Math.random()*280+"px";
+}
+
+/* ---------- WRONG CLICK ---------- */
+function wrongClick(){
+  if(!active) return;
+  sirenAlarm();
+  endGame("🚨 WRONG TARGET!");
+}
+
+/* ---------- END GAME ---------- */
+function endGame(msg){
+  active=false;
+  clearInterval(timer);
+  arena.innerHTML="";
+  document.getElementById("result").textContent =
+    msg + " Final Score: " + score;
+
+  saveScore();
+  document.getElementById("restartBtn").classList.remove("hidden");
+}
+
+/* ---------- SAVE SCORE ---------- */
+function saveScore(){
+  const name=document.getElementById("playerName").value;
+  leaderboard.push({name,score});
+  leaderboard.sort((a,b)=>b.score-a.score);
+  localStorage.setItem("focusBoard",JSON.stringify(leaderboard));
+  updateBoard();
+}
+
+/* ---------- RESTART ---------- */
+function restart(){
+  arena.innerHTML="";
+  document.getElementById("result").textContent="";
+  document.getElementById("playerName").value="";
+  document.getElementById("restartBtn").classList.add("hidden");
+}
+
+loadBoard();
+</script>
+
+</body>
+</html>

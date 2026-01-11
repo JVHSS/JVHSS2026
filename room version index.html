@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Escape Room – Smart Rotation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #020617;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.room {
+  background: #0f172a;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 460px;
+  text-align: center;
+  box-shadow: 0 0 25px #22d3ee;
+}
+
+h1 { color: #22d3ee; }
+
+.timer {
+  color: #facc15;
+  font-size: 18px;
+}
+
+.question {
+  font-size: 18px;
+  margin: 15px 0;
+}
+
+input {
+  padding: 10px;
+  width: 80%;
+  border-radius: 6px;
+  border: none;
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  margin-top: 12px;
+  background: #22d3ee;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.hidden { display: none; }
+
+img {
+  width: 100%;
+  max-width: 250px;
+  margin: 15px auto;
+  border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="room">
+  <h1>🔐 Escape Room</h1>
+  <p>Question Set: <b id="setName"></b></p>
+
+  <div class="timer">⏱ Time Left: <span id="time">90</span>s</div>
+
+  <div id="game">
+    <p>Question <span id="qno">1</span> / 10</p>
+    <div class="question" id="question"></div>
+    <input id="answer" placeholder="Type answer">
+    <br>
+    <button onclick="checkAnswer()">Submit</button>
+  </div>
+
+  <div id="win" class="hidden">
+    <img src="https://cdn-icons-png.flaticon.com/512/3159/3159066.png">
+    <h2>🎉 YOU ESCAPED!</h2>
+    <button onclick="nextPlayer()">Next Player ▶</button>
+  </div>
+
+  <div id="trap" class="hidden">
+    <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png">
+    <h2>⛔ YOU ARE TRAPPED!</h2>
+    <button onclick="nextPlayer()">Next Player ▶</button>
+  </div>
+</div>
+
+<script>
+// 🔁 10 QUESTIONS PER SET (AGE 13–15)
+const sets = [
+  [
+    {q:"5 × 6 ?",a:"30"},
+    {q:"Capital of India?",a:"new delhi"},
+    {q:"Largest planet?",a:"jupiter"},
+    {q:"√64 ?",a:"8"},
+    {q:"Gas we breathe?",a:"oxygen"},
+    {q:"Sun is a?",a:"star"},
+    {q:"7 continents true/false?",a:"true"},
+    {q:"Fastest land animal?",a:"cheetah"},
+    {q:"H2O is?",a:"water"},
+    {q:"Father of computers?",a:"charles babbage"}
+  ],
+  [
+    {q:"9 × 7 ?",a:"63"},
+    {q:"Capital of Tamil Nadu?",a:"chennai"},
+    {q:"Largest mammal?",a:"blue whale"},
+    {q:"Square of 9?",a:"81"},
+    {q:"Plants use sunlight for?",a:"photosynthesis"},
+    {q:"Earth satellite?",a:"moon"},
+    {q:"Smallest prime?",a:"2"},
+    {q:"Liquid metal?",a:"mercury"},
+    {q:"Vitamin from sun?",a:"vitamin d"},
+    {q:"Our galaxy?",a:"milky way"}
+  ],
+  [
+    {q:"8 × 8 ?",a:"64"},
+    {q:"National bird of India?",a:"peacock"},
+    {q:"Chemical symbol of iron?",a:"fe"},
+    {q:"Angle of straight line?",a:"180"},
+    {q:"Gas in soda?",a:"carbon dioxide"},
+    {q:"Fastest bird?",a:"falcon"},
+    {q:"CPU full form?",a:"central processing unit"},
+    {q:"Unit of force?",a:"newton"},
+    {q:"Nearest star?",a:"sun"},
+    {q:"Blood is pumped by?",a:"heart"}
+  ]
+];
+
+let setIndex = 0;
+let qIndex = 0;
+let time = 90;
+let timer;
+
+// LOAD QUESTION
+function loadQuestion() {
+  document.getElementById("question").textContent = sets[setIndex][qIndex].q;
+  document.getElementById("qno").textContent = qIndex + 1;
+  document.getElementById("answer").value = "";
+}
+
+// CHECK ANSWER
+function checkAnswer() {
+  let user = document.getElementById("answer").value.toLowerCase().trim();
+  if (user === sets[setIndex][qIndex].a) {
+    qIndex++;
+    if (qIndex === 10) endGame("win");
+    else loadQuestion();
+  } else {
+    endGame("trap");
+  }
+}
+
+// TIMER
+function startTimer() {
+  timer = setInterval(() => {
+    time--;
+    document.getElementById("time").textContent = time;
+    if (time <= 0) endGame("trap");
+  }, 1000);
+}
+
+// END GAME
+function endGame(type) {
+  clearInterval(timer);
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById(type).classList.remove("hidden");
+}
+
+// NEXT PLAYER (NEW QUESTIONS)
+function nextPlayer() {
+  clearInterval(timer);
+  document.getElementById("win").classList.add("hidden");
+  document.getElementById("trap").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+
+  setIndex = (setIndex + 1) % sets.length;
+  document.getElementById("setName").textContent = "SET " + (setIndex + 1);
+
+  qIndex = 0;
+  time = 90;
+  document.getElementById("time").textContent = time;
+
+  loadQuestion();
+  startTimer();
+}
+
+// START FIRST PLAYER
+document.getElementById("setName").textContent = "SET 1";
+loadQuestion();
+startTimer();
+</script>
+
+</body>
+</html>
