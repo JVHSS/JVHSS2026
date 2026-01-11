@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Exhibition Feedback Form</title>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+    label {
+      color: black;
+    }
+.container {
+    width: 600px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h2 {
+      color: white;
+      background-color:  #0e79f3;
+      padding: 20px;
+    }
+
+label {
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 15px 0;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #0e79f3;
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0e79f3;
+}
+
+#thankYouBox {
+    display: none;
+    text-align: center;
+    padding: 30px;
+}
+
+#thankYouBox h2 {
+    color: #f4f4f4;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container" id="formBox">
+    <h2>SCIENCE AND ART FEST FEEDBACK FORM/அறிவியல் மற்றும் கலை விழா கருத்து படிவம்</h2>
+
+    <!-- hidden iframe to stop page reload -->
+    <iframe name="hiddenFrame" style="display:none;"></iframe>
+
+    <form 
+      action="https://script.google.com/macros/s/AKfycbzTNGktKGomnNnyoZqMqYcIAjOXH5Yjy8MKxUMyc1_Z_KKq3peZAN-rQhbieNKqcyV1ZA/exec"
+      method="POST"
+      target="hiddenFrame"
+      onsubmit="showThankYou()">
+
+        <label>Name/பெயர்:</label>
+        <input type="text" name="name" required>
+
+        <label>Class/வகுப்பு:</label>
+        <input type="text" name="studentClass">
+
+        <label>Section/பிரிவு:</label>
+        <input type="text" name="section" >
+
+        <label>Rating/மதிப்பீடு:</label>
+        <select name="rating" required>
+            <option value="">Select Rating</option>
+            <option>⭐ Excellent</option>
+            <option>😊 Good</option>
+            <option>🙂 Average</option>
+            <option>😐 Poor</option>
+        </select>
+
+        <label>What did you like?/உங்களுக்கு என்ன பிடித்திருந்தது?</label>
+        <textarea name="like" rows="3"></textarea>
+
+        <label>Suggestions for Improvement/மேம்படுத்துவதற்கான பரிந்துரைகள்</label>
+        <textarea name="improvement" rows="3"></textarea>
+
+        <label>Overall Experience/ஒட்டுமொத்த அனுபவம்:</label>
+        <textarea name="experience" rows="3"></textarea>
+
+        <button type="submit">Submit Feedback/கருத்தைச் சமர்ப்பிக்கவும்</button>
+    </form>
+</div>
+
+<!-- THANK YOU MESSAGE -->
+<div class="container" id="thankYouBox">
+    <h2>✅ Thanks for your feedback!/உங்கள் கருத்துக்கு நன்றி!</h2>
+    <p>Your response has been recorded successfully/உங்கள் பதில் வெற்றிகரமாக பதிவு செய்யப்பட்டுள்ளது..</p>
+</div>
+
+<script>
+function showThankYou() {
+    setTimeout(() => {
+        document.getElementById("formBox").style.display = "none";
+        document.getElementById("thankYouBox").style.display = "block";
+    }, 500);
+}
+</script>
+
+</body>
+</html>
